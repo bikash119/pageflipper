@@ -1,0 +1,44 @@
+.container .colorchoose {
+	height: 30px;
+	border-width: 2px;
+	border-style: solid;
+	border-color: red;
+	position: relative;
+}
+
+.container .colorchoose .btn-group {
+	position: absolute;
+	width: 100%;
+}
+
+.container .paintArea {
+	float: left;
+	width: 94%;
+	height: 540px;
+	border-color: red;
+	border-width: 2px;
+	border-style: solid;
+}
+
+.container .paintArea .colorbookcanvas {
+}
+
+.container .toolprop {
+	float: right;
+	height: 540px;
+	width: 5%;
+	border-width: 2px;
+	border-style: solid;
+	border-color: red;
+	position: relative;
+}
+
+.container .toolchoose {
+	clear: both;
+	bottom: 0;
+	height: 30px;
+	border-width: 2px;
+	border-style: solid;
+	border-color: red;
+	position: relative;
+}

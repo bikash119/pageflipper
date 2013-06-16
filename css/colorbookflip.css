@@ -1,0 +1,40 @@
+body, h2, p {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: #fff;
+	color: #444;
+	font-family: Helvetica, sans-serif;
+}
+
+#flippingcolorbook {
+	background-image: url("/img/book.png");
+	width: 830px;
+	height: 260px;
+	border-color: yellow;
+	border-width: 2px;
+	left: 25%;
+	top: 25%;
+	position: absolute;
+}
+
+#pages section {
+	background-image: url("/img/paper.png");
+	width: 400px;
+	border-color: green;
+	border-width: 2px;
+	left: 50%;
+	top: 2%;
+	height: 250px;
+	position: absolute;
+	overflow: hidden;
+	display: block;
+}
+
+#pages section>div {
+		display: block;
+		width: 400px;
+		font-size: 13px;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link href="css/colorbook.css" rel="stylesheet">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	</head>
+
+	<body>
+		<div id="colorbook" class="container">
+			<div id="colorchoose" class="colorchoose">
+				<div class="btn-group">
+					<button class="btn" id="button-green" value="green">Green</button>
+					<button class="btn" id="button-yellow" value="yellow">Yellow</button>
+					<button class="btn"	id="button-brown" value="brown">Brown</button>
+				</div>
+			</div>
+			<div id="paintArea" class="paintArea">
+				<canvas id="colorbookcanvas" class="colorbookcanvas"></canvas>
+			</div>
+			<div id="toolprop" class="toolprop">
+				<div class="btn-group btn-group-vertical">
+					<button class="btn" id="thick-very" value="10">V Thick</button>
+					<button class="btn" id="medium-very" value="5">M Thick</button>
+					<button class="btn" id="thin" value="2">Thin</button>
+				</div>
+			</div>
+			<div id="toolchose" class="toolchoose">
+				<div class="btn-group">
+					<button class="btn" id="tool-marker" value="marker">Marker</button>
+					<button class="btn" id="tool-crayon" value="crayon">Crayon</button>
+					<button class="btn" id="eraser" value="eraser">Eraser</button>
+				</div>
+			</div>
+		</div>
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="/js/colorbook.js"></script>
+	</body>
+		
+</html>

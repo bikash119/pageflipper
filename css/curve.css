@@ -1,0 +1,15 @@
+body{
+	margin: 0;
+	padding: 0;
+}
+
+#mainContainer{
+	top: 25%;
+	left: 25%;
+	width: 400px;
+	height: 400px;
+	border-style: solid;
+	border-color: yellow;
+	border-width: 2px;
+	position: absolute;
+}

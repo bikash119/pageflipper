@@ -22,12 +22,8 @@ body {
 
 #pages section {
 	background-image: url("/img/paper.png");
-	width: 400px;
-	border-color: green;
-	border-width: 2px;
 	left: 50%;
-	top: 2%;
-	height: 250px;
+	top: 5px;
 	position: absolute;
 	overflow: hidden;
 	display: block;
@@ -37,4 +33,15 @@ body {
 		display: block;
 		width: 400px;
 		font-size: 13px;
+		margin-top: 2px;
+		margin-right: 8px;
+		margin-bottom: 10px;
+		margin-left: 9px;
+}
+
+#flip-canvas {
+	margin-top: -60px;
+	margin-left: -60px;
+	position: absolute;
+	z-index: 100;
 }

@@ -1,122 +1,103 @@
 var flipbook = (function() {
-
-	var BOOK_WIDTH = 830;
-	var BOOK_HEIGHT = 260;
-	var PAGE_WIDTH = 400;
-	var PAGE_HEIGHT = BOOK_HEIGHT - 20;
+	var canvasContext = document.getElementById("flip-canvas").getContext("2d");
+	var bookContainer = document.getElementById("flippingcolorbook");
+	var sections = document.getElementsByTagName("section");
+	var CANVAS_PADDING = 120;
+	canvasContext.canvas.width = bookContainer.clientWidth + CANVAS_PADDING;
+	canvasContext.canvas.height = bookContainer.clientHeight + CANVAS_PADDING;
+	var mousePosition = {x:0,y:0};
+	var pages = [];
+	var BOOK_WIDTH = bookContainer.clientWidth;
+	var BOOK_HEIGHT = bookContainer.clientHeight;
+	var canvasOrigin = {x:0,y:0};
 	var canvasContainer;
-	var sections = document.getElementsByTagName('section');
-	var leafCanvasCtxt = document.getElementById('flip-canvas').getContext('2d');
-	leafCanvasCtxt.canvas.width = BOOK_WIDTH;
-	leafCanvasCtxt.canvas.height = BOOK_HEIGHT;
-	var leaves = [];
-	var mousePosition = {x:0 , y:0};
-	var leftLeavesCount = 0;
-	var rightLeavesCount = sections.length - 1;
-	var nextClicked = false;
-	var previousClicked = false;
-	var resizeWidth = 0;
+	var foldWidth = 0;
+	var pageNumber = 0;
 
-	navigateToNextPage = function(e){
-		console.log( "Next Button Clicked");
-		if(rightLeavesCount > -1){
-			nextClicked = true;
-			if(leftLeavesCount < 0){
-				leaves[0].dragging = true;
-			}else{
-				leaves[leftLeavesCount].dragging = true;
-			}
-			leftLeavesCount += 1;
-			rightLeavesCount -= 1;
-		}
+	clickPosition = function(mousePosition){
+		var canvasContainer = canvasContext.canvas.getBoundingClientRect();
+		var borderWidth = canvasContext.canvas.style.borderWidth;
+		var xPosition = Math.round ( mousePosition.x - canvasContainer.left);
+		var yPosition = Math.round ( mousePosition.y - canvasContainer.top);
+		return {x: xPosition,y:yPosition};
 	}
 
-	navigateToPreviousPage = function(e){
-		console.log( "Previous Button clicked");
-		if(leftLeavesCount > -1){
-			previousClicked = true;
-			if(leftLeavesCount == 0){
-				leaves[0].dragging = true;
-			}else{
-				leaves[leftLeavesCount].dragging = true;
-				leftLeavesCount -= 1;
-				rightLeavesCount += 1;
+	mouseDownHandler = function(e){
+		e.preventDefault();
+		console.log( " Page Turn action invoked");
+		mousePosition.x = e.pageX;
+		mousePosition.y = e.pageY;
+		console.log( "Click Position " + e.pageX + " : " + e.pageY);
+		console.log( "Relative Click position " + clickPosition(mousePosition).x + " : " + clickPosition(mousePosition).y);
+		var pageToBeTurned = 0
+		for (var i = 0,len=pages.length; i < len; i++) {
+			if (pages[i].location === 'right'){
+				pageToBeTurned = i;
+				break;
 			}
 		}
+		pages[pageToBeTurned].dragging = true;
+		render();
+	}
+
+	mouseMoveHandler = function(e){
+		console.log( " Page Turn dragging action invoked");
+	}
+
+	mouseUpHandler = function(e){
+		console.log( " Page Turn action invoked");
+	}
+
+	registerMouseEvents = function(){
+		document.addEventListener('mousedown',mouseDownHandler,false);
+		document.addEventListener('mousemove',mouseMoveHandler,false);
+		document.addEventListener('mouseup',mouseUpHandler,false);
 	}
 
 	render = function(){
-		for (var i = 0,len=leaves.length; i < len; i++) {
-			if(leaves[i].dragging === true && leaves[i].leaf.clientWidth > 0){
-				resizeLeaf(leaves[i]);
-				drawShadowRect(leaves[i]);
+		for (var i = 0, len = pages.length; i < len; i++) {
+			if(pages[i].dragging === true){
+				var pageToTurn = pages[i];
+				var pageHeight = parseInt(pageToTurn.page.style.height);
+				var pageWidth = parseInt(pageToTurn.page.style.width);
+				var pageOffsetTop = parseInt(pageToTurn.page.offsetTop);
+				var canvasOffsetLeft = Math.abs(canvasContext.canvas.offsetLeft);
+				var canvasOffsetTop = Math.abs(canvasContext.canvas.offsetTop);
+				canvasContext.fillStyle = 'white';
+				canvasContext.lineWidth = 2;
+				var relativeClickPosition = clickPosition(mousePosition);
+				var pageCordinates = {xStart: 0, yStart:0,xEnd:0,yEnd:0};
+				pageCordinates.xStart = canvasOffsetLeft + BOOK_WIDTH / 2;
+				pageCordinates.xEnd = canvasOffsetLeft + BOOK_WIDTH / 2 + pageWidth;
+				pageCordinates.yStart = canvasOffsetTop + pageOffsetTop;
+				pageCordinates.yEnd = canvasOffsetTop + pageOffsetTop + pageHeight;
+				foldWidth = Math.round((pageCordinates.xEnd - relativeClickPosition.x) / 2);
+				pageToTurn.page.style.width = parseInt(pageToTurn.page.style.width) - foldWidth + "px";
+				canvasContext.moveTo(relativeClickPosition.x,pageCordinates.yStart);
+				canvasContext.lineTo(relativeClickPosition.x + foldWidth,pageCordinates.yStart);
+				canvasContext.lineTo(relativeClickPosition.x + foldWidth,pageCordinates.yEnd);
+				canvasContext.lineTo(relativeClickPosition.x , pageCordinates.yEnd);
+				canvasContext.lineTo(relativeClickPosition.x,pageCordinates.yStart);
+				canvasContext.fill();
 			}
 		}
 	}
 
-	resizeLeaf = function(currentLeaf){
-		resizeWidth = currentLeaf.leaf.clientWidth - 10;
-		currentLeaf.leaf.style.width = resizeWidth + 'px';
-		currentLeaf.leaf.clientWidth = resizeWidth;
-
-	}
-
-	drawShadowRect = function(currentLeaf){
-		leafCanvasCtxt.save();
-		var shadowStart = {x:0,y:0};
-		var foldWidth = Math.abs((PAGE_WIDTH - rectStart.x)/2);
-		canvasContext.translate(rectStart.x,rectStart.y);
-		canvasContext.beginPath();
-		canvasContext.moveTo(0,0);
-		canvasContext.lineTo(foldWidth,0);
-		canvasContext.lineTo(foldWidth,rectHeight);
-		canvasContext.lineTo(0,rectHeight);
-		canvasContext.lineTo(0,0);
-		canvasContext.fill();
-		canvasContext.restore();
-	}
-
-	mousePositionHandler = function(e){
-		console.log( "Mouse clicked at" +e.pageX + ","+e.pageY);
-	}
-
-	startTurn = function(e){
-
-	}
-
-	keepTurning = function(e){
-
-	}
-
-	stopTurn = function(e){
-
-	}
-
-	registerButtonClickEvents = function(){
-		var nextButton = document.getElementById('nextButton');
-		var previousButton = document.getElementById('previousButton');
-		nextButton.addEventListener('click',navigateToNextPage,false);
-		previousButton.addEventListener('click',navigateToPreviousPage,false);
-		leafCanvasCtxt.canvas.addEventListener('mousedown',startTurn,false);
-		leafCanvasCtxt.canvas.addEventListener('mousemove',keepTurning,false);
-		leafCanvasCtxt.canvas.addEventListener('mouseup',stopTurn,false);
-		document.addEventListener('click',mousePositionHandler,false);
-	}
+	//setInterval(render,1/60);
 
 	init = function(){
-		//convert all the sections as leaf of book
-		for (var i = 0, leafCount = sections.length; i < leafCount; i++) {
-			sections[i].style.zIndex = leafCount -i;
-			leaves.push({
+		registerMouseEvents();
+		canvasContainer = canvasContext.canvas.getBoundingClientRect();
+		for (var i = 0,len = sections.length; i < len; i ++) {
+			sections[i].style.zIndex = len - i;
+			sections[i].style.height = BOOK_HEIGHT - 10 + 'px';
+			sections[i].style.width = (BOOK_WIDTH / 2) - 15 + 'px';
+			pages.push({
+				page: sections[i],
 				dragging: false,
-				leaf:sections[i],
-				target: 1,
-				progress:1
+				location: 'right'
 			});
-		};
-		canvasContainer = leafCanvasCtxt.canvas.getBoundingClientRect();
-		registerButtonClickEvents();
-		setInterval(render,1000/60);
-	}
+		}
+	}	
 	init();
 })();

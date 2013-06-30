@@ -8,27 +8,26 @@ var flipbook = (function() {
 	var mousePosition = {x:0,y:0};
 	var pages = [];
 	var BOOK_WIDTH = bookContainer.clientWidth;
+	var PAGE_WIDTH = 0;
 	var BOOK_HEIGHT = bookContainer.clientHeight;
 	var canvasOrigin = {x:0,y:0};
 	var canvasContainer;
 	var foldWidth = 0;
+	var foldStrength = 0;
 	var pageNumber = 0;
 
-	clickPosition = function(mousePosition){
+	clickPosition = function(){
 		var canvasContainer = canvasContext.canvas.getBoundingClientRect();
 		var borderWidth = canvasContext.canvas.style.borderWidth;
-		var xPosition = Math.round ( mousePosition.x - canvasContainer.left);
-		var yPosition = Math.round ( mousePosition.y - canvasContainer.top);
+		var xPosition = Math.min(BOOK_WIDTH,Math.round ( mousePosition.x - canvasContainer.left));
+		var yPosition = Math.min(BOOK_HEIGHT,Math.round ( mousePosition.y - canvasContainer.top));
 		return {x: xPosition,y:yPosition};
 	}
 
 	mouseDownHandler = function(e){
 		e.preventDefault();
-		console.log( " Page Turn action invoked");
 		mousePosition.x = e.pageX;
 		mousePosition.y = e.pageY;
-		console.log( "Click Position " + e.pageX + " : " + e.pageY);
-		console.log( "Relative Click position " + clickPosition(mousePosition).x + " : " + clickPosition(mousePosition).y);
 		var pageToBeTurned = 0
 		for (var i = 0,len=pages.length; i < len; i++) {
 			if (pages[i].location === 'right'){
@@ -37,15 +36,21 @@ var flipbook = (function() {
 			}
 		}
 		pages[pageToBeTurned].dragging = true;
-		render();
 	}
 
 	mouseMoveHandler = function(e){
-		console.log( " Page Turn dragging action invoked");
+		mousePosition.x = e.pageX;
+		mousePosition.y = e.pageY;
 	}
 
 	mouseUpHandler = function(e){
-		console.log( " Page Turn action invoked");
+		for (var i = 0,len=pages.length; i < len; i++) {
+			if (pages[i].location === 'right'){
+				pageToBeTurned = i;
+				break;
+			}
+		}
+		pages[pageToBeTurned].dragging = false;
 	}
 
 	registerMouseEvents = function(){
@@ -54,16 +59,26 @@ var flipbook = (function() {
 		document.addEventListener('mouseup',mouseUpHandler,false);
 	}
 
+	getFoldStrength = function(pageOriginX,clickPositionX){
+		var distance = Math.abs(clickPositionX - pageOriginX);
+		console.log(distance);
+		foldStrength = (1/distance) * 1000;
+		console.log(foldStrength);
+		return Math.round(foldStrength);
+	}
+
 	render = function(){
+		canvasContext.clearRect(0,0,canvasContext.canvas.width, canvasContext.canvas.height);
 		for (var i = 0, len = pages.length; i < len; i++) {
 			if(pages[i].dragging === true){
+				
+				canvasContext.beginPath();
 				var pageToTurn = pages[i];
 				var pageHeight = parseInt(pageToTurn.page.style.height);
 				var pageWidth = parseInt(pageToTurn.page.style.width);
-				var pageOffsetTop = parseInt(pageToTurn.page.offsetTop);
+				var pageOffsetTop = parseInt(pageToTurn.page.offsetTop) - 2;
 				var canvasOffsetLeft = Math.abs(canvasContext.canvas.offsetLeft);
 				var canvasOffsetTop = Math.abs(canvasContext.canvas.offsetTop);
-				canvasContext.fillStyle = 'white';
 				canvasContext.lineWidth = 2;
 				var relativeClickPosition = clickPosition(mousePosition);
 				var pageCordinates = {xStart: 0, yStart:0,xEnd:0,yEnd:0};
@@ -71,19 +86,28 @@ var flipbook = (function() {
 				pageCordinates.xEnd = canvasOffsetLeft + BOOK_WIDTH / 2 + pageWidth;
 				pageCordinates.yStart = canvasOffsetTop + pageOffsetTop;
 				pageCordinates.yEnd = canvasOffsetTop + pageOffsetTop + pageHeight;
-				foldWidth = Math.round((pageCordinates.xEnd - relativeClickPosition.x) / 2);
-				pageToTurn.page.style.width = parseInt(pageToTurn.page.style.width) - foldWidth + "px";
-				canvasContext.moveTo(relativeClickPosition.x,pageCordinates.yStart);
+				foldWidth = Math.round((BOOK_WIDTH - relativeClickPosition.x) / 2);
+				foldStrength = getFoldStrength(pageCordinates.xStart,relativeClickPosition.x);
+				console.log(foldStrength);
+				var temp = Math.abs(parseInt(pageToTurn.page.style.width) - Math.abs(foldWidth));
+				pageToTurn.page.style.width = Math.max(Math.abs(relativeClickPosition.x - pageCordinates.xStart),temp) + "px";
+				canvasContext.moveTo(relativeClickPosition.x,pageCordinates.yStart - Math.min(foldStrength,40));
 				canvasContext.lineTo(relativeClickPosition.x + foldWidth,pageCordinates.yStart);
 				canvasContext.lineTo(relativeClickPosition.x + foldWidth,pageCordinates.yEnd);
-				canvasContext.lineTo(relativeClickPosition.x , pageCordinates.yEnd);
-				canvasContext.lineTo(relativeClickPosition.x,pageCordinates.yStart);
+				canvasContext.lineTo(relativeClickPosition.x , pageCordinates.yEnd + Math.min(foldStrength,40));
+				canvasContext.lineTo(relativeClickPosition.x,pageCordinates.yStart - Math.min(foldStrength,40));
+				var gradient = canvasContext.createLinearGradient(relativeClickPosition.x,pageCordinates.yStart, foldWidth,pageCordinates.yEnd)
+				gradient.addColorStop(0.35, '#fafafa');
+				gradient.addColorStop(0.73, '#eeeeee');
+				gradient.addColorStop(0.9, '#fafafa');
+				gradient.addColorStop(1.0, '#e2e2e2');
+				canvasContext.fillStyle = gradient;
 				canvasContext.fill();
 			}
 		}
 	}
 
-	//setInterval(render,1/60);
+	setInterval(render,1000/50);
 
 	init = function(){
 		registerMouseEvents();
@@ -92,6 +116,7 @@ var flipbook = (function() {
 			sections[i].style.zIndex = len - i;
 			sections[i].style.height = BOOK_HEIGHT - 10 + 'px';
 			sections[i].style.width = (BOOK_WIDTH / 2) - 15 + 'px';
+			PAGE_WIDTH = parseInt(sections[i].style.width);
 			pages.push({
 				page: sections[i],
 				dragging: false,

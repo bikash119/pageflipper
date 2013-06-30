@@ -131,12 +131,15 @@
 		
 		// Width of the folded paper
 		var foldWidth = ( PAGE_WIDTH * 0.5 ) * ( 1 - flip.progress );
+
+		console.log(foldWidth);
 		
 		// X position of the folded paper
 		var foldX = PAGE_WIDTH * flip.progress + foldWidth;
 		
 		// How far the page should outdent vertically due to perspective
 		var verticalOutdent = 20 * strength;
+		//console.log(verticalOutdent);
 		
 		// The maximum width of the left and right side shadows
 		var paperShadowWidth = ( PAGE_WIDTH * 0.5 ) * Math.max( Math.min( 1 - flip.progress, 0.5 ), 0 );

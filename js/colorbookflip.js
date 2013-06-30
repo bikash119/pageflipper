@@ -61,10 +61,8 @@ var flipbook = (function() {
 
 	getFoldStrength = function(pageOriginX,clickPositionX){
 		var distance = Math.abs(clickPositionX - pageOriginX);
-		console.log(distance);
 		foldStrength = (1/distance) * 1000;
-		console.log(foldStrength);
-		return Math.round(foldStrength);
+		return Math.floor(foldStrength);
 	}
 
 	render = function(){
@@ -83,19 +81,17 @@ var flipbook = (function() {
 				var relativeClickPosition = clickPosition(mousePosition);
 				var pageCordinates = {xStart: 0, yStart:0,xEnd:0,yEnd:0};
 				pageCordinates.xStart = canvasOffsetLeft + BOOK_WIDTH / 2;
-				pageCordinates.xEnd = canvasOffsetLeft + BOOK_WIDTH / 2 + pageWidth;
+				pageCordinates.xEnd = canvasOffsetLeft + BOOK_WIDTH;
 				pageCordinates.yStart = canvasOffsetTop + pageOffsetTop;
 				pageCordinates.yEnd = canvasOffsetTop + pageOffsetTop + pageHeight;
 				foldWidth = Math.round((BOOK_WIDTH - relativeClickPosition.x) / 2);
 				foldStrength = getFoldStrength(pageCordinates.xStart,relativeClickPosition.x);
-				console.log(foldStrength);
-				var temp = Math.abs(parseInt(pageToTurn.page.style.width) - Math.abs(foldWidth));
-				pageToTurn.page.style.width = Math.max(Math.abs(relativeClickPosition.x - pageCordinates.xStart),temp) + "px";
-				canvasContext.moveTo(relativeClickPosition.x,pageCordinates.yStart - Math.min(foldStrength,40));
+				pageToTurn.page.style.width = relativeClickPosition.x - pageCordinates.xStart + "px";
+				canvasContext.moveTo(relativeClickPosition.x,pageCordinates.yStart - Math.min(foldStrength,30));
 				canvasContext.lineTo(relativeClickPosition.x + foldWidth,pageCordinates.yStart);
 				canvasContext.lineTo(relativeClickPosition.x + foldWidth,pageCordinates.yEnd);
-				canvasContext.lineTo(relativeClickPosition.x , pageCordinates.yEnd + Math.min(foldStrength,40));
-				canvasContext.lineTo(relativeClickPosition.x,pageCordinates.yStart - Math.min(foldStrength,40));
+				canvasContext.lineTo(relativeClickPosition.x , pageCordinates.yEnd + Math.min(foldStrength,30));
+				canvasContext.lineTo(relativeClickPosition.x,pageCordinates.yStart - Math.min(foldStrength,30));
 				var gradient = canvasContext.createLinearGradient(relativeClickPosition.x,pageCordinates.yStart, foldWidth,pageCordinates.yEnd)
 				gradient.addColorStop(0.35, '#fafafa');
 				gradient.addColorStop(0.73, '#eeeeee');
@@ -107,7 +103,7 @@ var flipbook = (function() {
 		}
 	}
 
-	setInterval(render,1000/50);
+	setInterval(render,1000/100);
 
 	init = function(){
 		registerMouseEvents();

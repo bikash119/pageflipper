@@ -4,39 +4,43 @@ body, h2, p {
 }
 
 body {
-	background-color: #fff;
+	background-color: rgb(211,211,211);
 	color: #444;
 	font-family: Helvetica, sans-serif;
 }
 
 #flippingcolorbook {
 	background-image: url("/img/book.png");
-	width: 830px;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	width: 800px;
 	height: 260px;
-	border-color: yellow;
-	border-width: 2px;
 	left: 25%;
 	top: 25%;
 	position: absolute;
+	border-color: rgb(0,0,0);
 }
 
 #pages section {
 	background-image: url("/img/paper.png");
+	background-size: 100% 100%;
 	left: 50%;
 	top: 5px;
 	position: absolute;
 	overflow: hidden;
 	display: block;
+	border-width: 2px;
+	border-color: rgb(0,0,0);
 }
 
 #pages section>div {
 		display: block;
-		width: 400px;
 		font-size: 13px;
 		margin-top: 2px;
 		margin-right: 8px;
 		margin-bottom: 10px;
 		margin-left: 9px;
+		
 }
 
 #flip-canvas {

@@ -15,6 +15,7 @@ var flipbook = (function() {
 	var pageNumber = 0;
 	var pageCoordinates = {xStart:0,yStart:0,xEnd:0,yEnd:0};
 	var bookCoordinates = {xStart:0,yStart:0,xEnd:0,yEnd:0};
+	var orientation = 'rtl';
 
 	getX = function(xPosition){
 		return Math.round(xPosition - canvasContainer.left);
@@ -49,22 +50,55 @@ var flipbook = (function() {
 		
 	}
 
+	isValidMouseDownPosition = function(e){
+		var valid = {x:false,y:false};
+		if(e.pageX < pageCoordinates.xEnd && e.pageX > bookCoordinates.xStart + 10){
+			valid.x = true;
+		}
+		if(e.pageY < pageCoordinates.yEnd && e.pageY > pageCoordinates.yStart){
+			valid.y = true;
+		}
+		return valid;	
+	}
+
 	mouseDownHandler = function(e){
 		e.preventDefault();
-		mousePosition.x = e.pageX;
-		mousePosition.y = e.pageY;
-		getFoldStrength(mousePosition);
-		pages[pageNumber].dragging = true;
+		var valid = isValidMouseDownPosition(e);
+		if(valid.x && valid.y){
+			mousePosition.x = e.pageX;
+			mousePosition.y = e.pageY;
+			getFoldStrength(mousePosition);
+			if(e.pageX < pageCoordinates.xStart && pageNumber > 0){
+				pageNumber -= 1;
+				pages[pageNumber].dragging = true;
+			}else{
+				pages[pageNumber].dragging = true;
+			}
+		}
 	}
 
 	performAnimation = function(){
 		animate();
 	}
 
+	isValidMouseDrag = function(e){
+		var valid = {x:false,y:false};
+		if(e.pageX < pageCoordinates.xEnd && e.pageX > bookCoordinates.xStart + 10){
+			valid.x = true;
+		}
+		if(e.pageY < pageCoordinates.yEnd && e.pageY > pageCoordinates.yStart){
+			valid.y = true;
+		}
+		return valid;	
+	}
+
 	mouseMoveHandler = function(e){
-		mousePosition.x = e.pageX;
-		mousePosition.y = e.pageY;
-		getFoldStrength(mousePosition);
+		var valid = isValidMouseDrag(e);
+		if(valid.x && valid.y){
+			mousePosition.x = e.pageX;
+			mousePosition.y = e.pageY;
+			getFoldStrength(mousePosition);
+		}
 	}
 
 	mouseUpHandler = function(e){
@@ -114,6 +148,7 @@ var flipbook = (function() {
 				canvasContext.moveTo(getX(mousePosition.x),getY(pageCoordinates.yStart - foldStrength));
 				canvasContext.quadraticCurveTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yStart - foldStrength - 10),getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yStart))
 				canvasContext.lineTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yEnd));
+				console.log( foldStrength);
 				canvasContext.quadraticCurveTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yEnd + foldStrength + 10),getX(mousePosition.x),getY(pageCoordinates.yEnd + foldStrength))
 				canvasContext.lineTo(getX(mousePosition.x),getY(pageCoordinates.yStart - foldStrength));
 				canvasContext.fill();

@@ -27,20 +27,21 @@ body {
 	left: 50%;
 	top: 5px;
 	position: absolute;
-	overflow: hidden;
+	overflow:hidden;
 	display: block;
 	border-width: 2px;
 	border-color: rgb(0,0,0);
 }
 
 #pages section>div {
-		display: block;
+		display: inline-block;
+		position: absolute;
 		font-size: 13px;
 		margin-top: 2px;
 		margin-right: 8px;
 		margin-bottom: 10px;
 		margin-left: 9px;
-		
+		overflow: visible;
 }
 
 #flip-canvas {

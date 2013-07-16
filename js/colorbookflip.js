@@ -103,14 +103,14 @@ var flipbook = (function() {
 
 	mouseUpHandler = function(e){
 		var temp = Math.min(pageCoordinates.xStart,mousePosition.x);
+		canvasContext.clearRect(0,0,canvasContext.canvas.width, canvasContext.canvas.height);
 		var increasePageNumber = false;
 		for (var i = 0, len = pages.length; i < len; i++) {
+			pages[i].dragging = false;
 			if (temp == mousePosition.x && parseInt(pages[i].page.style.width) <= 0 ){
 				increasePageNumber = true;
 			}
-			pages[i].dragging = false;
 		};
-
 		if(increasePageNumber){
 			pageNumber += 1;
 		}
@@ -146,10 +146,9 @@ var flipbook = (function() {
 				canvasContext.fillStyle = 'white';
 				canvasContext.beginPath();
 				canvasContext.moveTo(getX(mousePosition.x),getY(pageCoordinates.yStart - foldStrength));
-				canvasContext.quadraticCurveTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yStart - foldStrength - 10),getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yStart))
+				canvasContext.quadraticCurveTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yStart - foldStrength - 10),getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yStart));
 				canvasContext.lineTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yEnd));
-				console.log( foldStrength);
-				canvasContext.quadraticCurveTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yEnd + foldStrength + 10),getX(mousePosition.x),getY(pageCoordinates.yEnd + foldStrength))
+				canvasContext.quadraticCurveTo(getX( (mousePosition.x + pageCoordinates.xEnd)/2 ),getY(pageCoordinates.yEnd + foldStrength + 10),getX(mousePosition.x),getY(pageCoordinates.yEnd + foldStrength));
 				canvasContext.lineTo(getX(mousePosition.x),getY(pageCoordinates.yStart - foldStrength));
 				canvasContext.fill();
 			}
